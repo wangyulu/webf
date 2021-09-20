@@ -5,7 +5,7 @@ import (
 )
 
 func registerRouter(core *framework.Core) {
-	// core.Get("foo", FooControllerHandler)
+	core.Get("/foo", framework.TimeoutHandler(FooControllerHandler, 5))
 
 	// HTTP Method + 静态路由
 	core.Get("/user/login", UserLoginController)
