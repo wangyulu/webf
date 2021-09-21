@@ -19,7 +19,8 @@ type Context struct {
 
 	writerMux *sync.Mutex
 
-	handler ControllerHandler
+	handlers []ControllerHandler
+	index    int
 }
 
 func NewContext(w http.ResponseWriter, r *http.Request) *Context {
@@ -30,6 +31,8 @@ func NewContext(w http.ResponseWriter, r *http.Request) *Context {
 		ctx: r.Context(),
 
 		writerMux: &sync.Mutex{},
+
+		index: -1,
 	}
 }
 
@@ -45,8 +48,17 @@ func (ctx *Context) GetResponse() http.ResponseWriter {
 	return ctx.responseWriter
 }
 
-func (ctx *Context) SetHandler(handler ControllerHandler) {
-	ctx.handler = handler
+func (ctx *Context) SetHandler(handlers ...ControllerHandler) {
+	ctx.handlers = handlers
+}
+
+func (ctx *Context) Next() error {
+	ctx.index++
+	if ctx.index < len(ctx.handlers) {
+		return ctx.handlers[ctx.index](ctx)
+	}
+
+	return nil
 }
 
 func (ctx *Context) HasTimeout() bool {

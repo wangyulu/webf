@@ -21,8 +21,10 @@ func TimeoutHandler(handler ControllerHandler, timeout time.Duration) Controller
 					panicChan <- p
 				}
 			}()
-			// 执行具体的业务逻辑
-			time.Sleep(10 * time.Second)
+
+			// 这里是具体的业务逻辑
+			// 为什么没有处理 err 的情况 --todo
+			handler(c)
 
 			finishChan <- struct{}{}
 		}()
